@@ -85,38 +85,5 @@ public class StreamTest {
 
     }
 
-    public Map<String, String> findComBonds() {
-        //主体发行时间最近的债券
-        Map<String, String> resultMap = new HashMap<>();
-//        Map<String, List<BondDetailItem>> map = bondDetailDao.getAllBondDetails()
-//                .stream()
-//                .filter(w -> StringUtils.isNotEmpty(w.getInstitutionCode()))
-//                .collect(Collectors.groupingBy(BondDetailItem::getInstitutionCode));
-//        map.keySet().forEach(w -> {
-//            List<BondDetailItem> detailDtos = map.get(w);
-//            if (CollectionUtils.isEmpty(detailDtos)) {
-//                return;
-//            }
 
-        List<BondDetailItem> detailDtos = new ArrayList<>();
-        detailDtos
-                .stream()
-                .filter(q -> q.getIssuedate() != null).max(Comparator.comparing(BondDetailItem::getIssuedate)).ifPresent(bondDetailItem -> {
-            String bondUnicode = bondDetailItem.getSecId() + bondDetailItem.getListMarketEn();
-            resultMap.put(w, bondUnicode);
-                }
-        );
-
-        BondDetailItem dto = null;
-        if (!list.isEmpty()) {
-            list.sort(Comparator.comparing(BondDetailItem::getIssuedate).reversed());
-            dto = list.get(0);
-        }
-        if (dto != null) {
-            String bondUnicode = dto.getSecId() + dto.getListMarketEn();
-            resultMap.put(w, bondUnicode);
-        }
-    });
-        return resultMap;
-}
 }

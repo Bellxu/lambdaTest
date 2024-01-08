@@ -2,6 +2,7 @@ package com.example.lambdatest;
 
 public class Student {
     String name;
+    String grade;
     double score;
     int age;
 
@@ -29,8 +30,32 @@ public class Student {
         this.age = age;
     }
 
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+
     public Student(String name, double score) {
         this.name = name;
         this.score = score;
+    }
+
+    public Student(String name, String grade, double score) {
+        this.name = name;
+        this.grade = grade;
+        this.score = score;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "name='" + name + '\'' +
+                ", grade='" + grade + '\'' +
+                ", score=" + score +
+                ", age=" + age +
+                '}';
     }
 }
