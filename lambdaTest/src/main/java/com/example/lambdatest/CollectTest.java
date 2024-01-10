@@ -3,6 +3,7 @@ package com.example.lambdatest;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +19,7 @@ import static java.util.stream.Collectors.*;
 
 public class CollectTest {
 
-    static List<Student> students = Arrays.asList(new Student[] {
+    static List<Student> students = Arrays.asList(new Student[]{
             new Student("zhangsan", "1", 91d), new Student("lisi", "2", 89d),
             new Student("wangwu", "1", 50d), new Student("zhaoliu", "2", 78d),
             new Student("sunqi", "1", 59d)});
@@ -48,14 +49,26 @@ public class CollectTest {
         System.out.println(collect);
     }
 
-    private static void groupingBy(){
+    private static void groupingBy() {
 //        Map<String, List<Student>> collect = students.stream().collect(Collectors.groupingBy(Student::getGrade));
+        //按年级分组,然后计数
         Map<String, Long> collect = students.stream().collect(Collectors.groupingBy(Student::getGrade, counting()));
         collect.forEach((key, value) -> System.out.println("key:" + key + "---" + "value" + value));
+        //按年级分组,然后获得分数最高的
         Map<String, Optional<Student>> collect1 = students.stream().collect(Collectors.groupingBy(Student::getGrade, maxBy(Comparator.comparing(Student::getScore))));
-        collect1.forEach((key, value) -> System.out.println("key:" + key + "---" + "value" + value));
-        Map<String, Student> collect2 = students.stream().collect(Collectors.groupingBy(Student::getGrade, collectingAndThen(maxBy(Comparator.comparing(Student::getScore)), Optional::get)));
-        collect2.forEach((key, value) -> System.out.println("key:" + key + "---" + "value" + value));
+        collect1.forEach((key, value) -> System.out.println("collect1 key:" + key + "---" + "value" + value));
+//        Map<String, Student> collect2 = students.stream().collect(Collectors.groupingBy(Student::getGrade, collectingAndThen(maxBy(Comparator.comparing(Student::getScore)), Optional::get)));
+        Map<String, Student> collect2 = students.stream().collect(Collectors.toMap(Student::getGrade, Function.identity(), BinaryOperator.maxBy(Comparator.comparing(Student::getScore))));
+        collect2.forEach((key, value) -> System.out.println("collect2 key:" + key + "---" + "value" + value));
+        ///按年级分组 然后获取各种统计的总和类
+        Map<String, DoubleSummaryStatistics> collect3 = students.stream().collect(Collectors.groupingBy(Student::getGrade, summarizingDouble(Student::getScore)));
+        collect3.forEach((key, value) -> System.out.println("collect3 key:" + key + "---" + "value" + value.toString()));
+        //
+        Map<String, List<String>> collect4 = students.stream().collect(Collectors.groupingBy(Student::getGrade, mapping(Student::getName, toList())));
+        collect4.forEach((key, value) -> System.out.println("collect4 key:" + key + "---" + "value" + value.toString()));
+
+        //分组结果处理
+
 
     }
 }
