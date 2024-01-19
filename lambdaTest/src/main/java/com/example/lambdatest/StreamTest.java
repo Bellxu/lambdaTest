@@ -19,7 +19,12 @@ public class StreamTest {
             new Student("wangwu", 98d)});
 
     public static void main(String[] args) {
-
+        byte[] b1 = {34, 87, 105, 70, 105, 76, 105, 115, 116, 34, 125};
+        byte[] b2 = new byte[20];
+        System.arraycopy(b1,0,b2,0,b1.length);
+        System.out.println(Arrays.toString(b2));
+        System.out.println(new String(b2).length());
+        System.out.println(new String("\"WiFiList\"}").length());
     }
 
     public static void test() {
@@ -45,7 +50,6 @@ public class StreamTest {
                 .flatMap(line -> Arrays.stream(line.split("\\s+")))
                 .collect(Collectors.toList());
         System.out.println(words);
-
         //终端操作
         //返回最大的max 最小的min
         Optional<Student> max = students.stream().filter(student -> student.getScore() > 90).max(Comparator.comparing(Student::getName));

@@ -12,6 +12,8 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,8 +29,8 @@ public class CollectTest {
     public static void main(String[] args) {
 //        toMap();
 //        stringCollect();
-        groupingBy();
-
+//        groupingBy();
+        partitionBy();
     }
 
     private static void toMap() {
@@ -63,12 +65,40 @@ public class CollectTest {
         ///按年级分组 然后获取各种统计的总和类
         Map<String, DoubleSummaryStatistics> collect3 = students.stream().collect(Collectors.groupingBy(Student::getGrade, summarizingDouble(Student::getScore)));
         collect3.forEach((key, value) -> System.out.println("collect3 key:" + key + "---" + "value" + value.toString()));
-        //
+        //按年级分组 然后得到学生名称的列表
         Map<String, List<String>> collect4 = students.stream().collect(Collectors.groupingBy(Student::getGrade, mapping(Student::getName, toList())));
         collect4.forEach((key, value) -> System.out.println("collect4 key:" + key + "---" + "value" + value.toString()));
 
         //分组结果处理
+        //按照年级分组 组内按照成绩从高到低排序
+        Map<String, List<Student>> collect5 = students.stream().collect(Collectors.groupingBy(Student::getGrade, collectingAndSort(toList(), Comparator.comparing(Student::getScore).reversed())));
+        //按照年级分组 分组后保留不及格的学生
+        Map<String, List<Student>> collect6 = students.stream().collect(Collectors.groupingBy(Student::getGrade, collectingAndFilter(toList(), t -> t.getScore() < 60)));
 
+        //分区
+    }
 
+    private static void partitionBy(){
+        Map<Boolean, List<Student>> collect = students.stream().collect(partitioningBy(t -> t.getScore() > 60));
+        Map<Boolean, Double> collect1 = students.stream().collect(partitioningBy(t -> t.getScore() > 60, averagingDouble(Student::getScore)));
+        collect.forEach((aBoolean, students) -> {
+            System.out.println("yes"+aBoolean+"--student"+Arrays.toString(students.toArray()));
+        });
+
+    }
+
+    public static <T> Collector<T, ? , List<T>> collectingAndSort(
+            Collector<T, ? , List<T>> downstream, Comparator<? super T> comparator) {
+        return Collectors.collectingAndThen(downstream, (r) -> {
+            r.sort(comparator);
+            return r;
+        });
+    }
+
+    public static <T> Collector<T, ? , List<T>> collectingAndFilter(
+            Collector<T, ? , List<T>> downstream, Predicate<T> predicate) {
+        return Collectors.collectingAndThen(downstream, (r) -> {
+            return r.stream().filter(predicate).collect(Collectors.toList());
+        });
     }
 }
